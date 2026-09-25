@@ -1,0 +1,7 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "lunamatch"
+version = "8.0.2"
+dependencies = ["numpy>=1.24,<3", "opencv-python>=4.8,<5", "shapely>=2.0,<3", "scipy>=1.10,<2"]

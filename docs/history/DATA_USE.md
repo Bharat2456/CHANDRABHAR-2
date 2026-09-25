@@ -1,0 +1,1 @@
+Chandrayaan-2 data-use terms must be checked against the current PRADAN policy before distribution or commercial deployment. This prototype does not grant any data rights. Cite Chandrayaan-2/ISRO/ISSDC as requested by the archive when publishing results.

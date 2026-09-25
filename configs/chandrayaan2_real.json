@@ -1,0 +1,14 @@
+{
+  "selected_products": {
+    "OHRC": "ch2_ohr_ncp_20260103T1005176450_d_img_d18",
+    "TMC2": "ch2_tmc_ncf_20231101T1708581528_d_img_d18",
+    "IIRS": "ch2_iir_nci_20210622T1850441449_d_img_d32"
+  },
+  "physical_policy": {
+    "common_gsd_levels": [1.0, 1.5, 2.5, 4.0, 6.0],
+    "never_hide_computational_stride": true,
+    "never_claim_physical_validation_from_display_resize": true
+  },
+  "evidence_gate": {"min_inliers": 12, "min_inlier_ratio": 0.35, "min_coverage": 0.35, "max_rmse_px": 2.5},
+  "note": "Product IDs are the real three-way-overlap candidates selected from PRADAN footprint layers during project development. Actual registration success must be established by running the downloaded products through this release."
+}

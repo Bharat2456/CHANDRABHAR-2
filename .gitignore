@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+venv/
+env/
+ENV/
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+
+# Runtime / generated outputs
+outputs/
+CHANDRABHAR-2_Platform_Outputs/
+*.log
+*.tmp
+*.bak
+
+# Mission data — NEVER commit raw mission products
+mission_data/
+**/mission_data/
+ChandrayaanData/
+**/ChandrayaanData/
+*.img
+*.qub
+*.raw
+*.bin
+*.dat
+*.lbr
+*.oat
+*.oath
+*.spm
+
+# Large/generated archives
+*.zip
+*.7z
+*.tar
+*.tar.gz
+
+# Local validation/result dumps
+*.jsonl
+results_local/
+validation_outputs/

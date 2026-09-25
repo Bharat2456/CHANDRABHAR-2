@@ -1,0 +1,38 @@
+{
+  "release": "8.0.2",
+  "passed": true,
+  "checks": [
+    {
+      "name": "pytest",
+      "returncode": 0,
+      "stdout": "..................                                                       [100%]\n18 passed in 2.65s\n",
+      "stderr": ""
+    },
+    {
+      "name": "selftest",
+      "returncode": 0,
+      "stdout": "CHANDRABHAR-2 ENGINE SELF-TEST PASSED\n{'passed': True, 'inliers': 327, 'ratio': 0.360529217199559, 'coverage': 0.9375, 'rmse_px': 0.7985907793045044}\n",
+      "stderr": ""
+    },
+    {
+      "name": "file_exists:README.md",
+      "ok": true
+    },
+    {
+      "name": "file_exists:VERSION.txt",
+      "ok": true
+    },
+    {
+      "name": "file_exists:app/core/pipeline.py",
+      "ok": true
+    },
+    {
+      "name": "file_exists:app/io/reader.py",
+      "ok": true
+    },
+    {
+      "name": "file_exists:app/adapters/pds4.py",
+      "ok": true
+    }
+  ]
+}
