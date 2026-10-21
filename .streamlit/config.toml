@@ -1,0 +1,26 @@
+# CHANDRABHAR-2 | Lunar Intelligence Interface
+# Native-widget theme tokens. Custom components read the same palette from ui/tokens.py.
+# Streamlit follows the OS preference by default and exposes Dark / Light / System in
+# the app menu (top-right "⋮" > Settings > Theme).
+
+[server]
+headless = false
+
+[browser]
+gatherUsageStats = false
+
+[theme.dark]
+base = "dark"
+primaryColor = "#38B6E8"
+backgroundColor = "#07090D"
+secondaryBackgroundColor = "#0D1117"
+textColor = "#E8EDF4"
+borderColor = "#26303F"
+
+[theme.light]
+base = "light"
+primaryColor = "#1F4E8C"
+backgroundColor = "#F4F1EA"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#14181F"
+borderColor = "#D9D4C7"

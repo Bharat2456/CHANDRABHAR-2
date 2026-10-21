@@ -10,6 +10,23 @@ Two version lines exist and are tracked separately, exactly as they were before 
   `app/adapters`). Unchanged by the CHANDRABHAR-2 productization pass.
 - **Platform version** (`PLATFORM_VERSION.txt`) — the dashboard/UI/docs/packaging layer.
 
+## Platform v2.1.0 — Lunar Intelligence Interface (UI/UX redesign)
+
+Presentation layer only. **`app/` is byte-identical to v2.0.0; engine remains v8.0.2.**
+
+### Changed
+- `dashboard.py` is now a thin shell; UI split into `ui/` (tokens, theme, components, logic, pages, runner).
+- Five pages via `st.navigation`: Mission Overview, Data Workspace, Image Registration, Evidence & Results, Reports & Export.
+- Complete dark (Orbital Night) and light (Lunar Daylight) themes (`.streamlit/config.toml` + `ui/tokens.py`).
+- Evidence shown as four separate claims; green is used only for a passed evidence gate.
+- Removed the hard-coded "Problem-statement coverage" ✅ list (it did not reflect the result).
+- Unreadable product labels are now listed with their error instead of silently skipped.
+- Rescan asks for confirmation before resetting a recorded completed run's workflow state.
+- Pre-run selection validation and plain-language error guidance (raw exception still shown).
+
+### Added
+- `tests/test_ui_logic.py`, `tools/ui_preview.py`, `docs/UI_DESIGN_SYSTEM.md`.
+
 ## Platform v2.0.0-chandrabhar2 — CHANDRABHAR-2 rebrand (this delivery)
 
 Presentation, documentation, and packaging release. **No scientific-core file under `app/core`,

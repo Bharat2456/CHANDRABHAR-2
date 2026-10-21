@@ -27,3 +27,10 @@ presentation assets.
   association.
 - Backgrounds stay near-black (`Mission Black` / `Panel Black`); pure white backgrounds are not
   used anywhere in the product.
+
+## Update — platform v2.1.0 (two themes)
+
+The UI now ships **Orbital Night** (dark) and **Lunar Daylight** (light). The earlier rule "pure white
+backgrounds are not used" is superseded: Lunar Daylight uses porcelain `#F4F1EA` page backgrounds with white
+panels. Authoritative values live in `ui/tokens.py`. Unchanged: green = gate passed only, red = errors only,
+tricolour used only as the thin rule under the wordmark.
