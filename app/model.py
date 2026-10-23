@@ -56,3 +56,4 @@ class MatchResult:
     points_ref: np.ndarray = field(default_factory=lambda: np.empty((0,2),np.float32))
     points_src: np.ndarray = field(default_factory=lambda: np.empty((0,2),np.float32))
     diagnostics: dict[str, Any] = field(default_factory=dict)
+    inlier_mask: Optional[np.ndarray] = None

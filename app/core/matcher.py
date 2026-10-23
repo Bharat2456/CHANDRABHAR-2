@@ -1,5 +1,6 @@
 import cv2,numpy as np
 from app.model import MatchResult
+from app.core.evidence import GATE_THRESHOLDS as _T
 
 def _single(rep):
  if rep.ndim==3:
@@ -26,12 +27,12 @@ def _grid_coverage(points,h,w):
 def _result_from_points(pr,ps,kr=0,ks=0,method='MULTIMODAL'):
  pr=np.asarray(pr,np.float32); ps=np.asarray(ps,np.float32)
  if len(pr)<3:return MatchResult(method,kr,ks,len(pr),0,0.0,None,None,None,0.0,None,pr,ps,{'status':'INSUFFICIENT_EVIDENCE','reason':'too_few_correspondences'})
- H,mask=cv2.findHomography(ps,pr,cv2.RANSAC,3.0,maxIters=10000,confidence=.995)
+ H,mask=cv2.findHomography(ps,pr,cv2.RANSAC,_T['ransac_reproj_px'],maxIters=10000,confidence=.995)
  if H is None:return MatchResult(method,kr,ks,len(pr),0,0.0,None,None,None,0.0,None,pr,ps,{'status':'INSUFFICIENT_EVIDENCE','reason':'ransac_failed'})
  m=mask.ravel().astype(bool); pred=cv2.perspectiveTransform(ps.reshape(-1,1,2),H).reshape(-1,2); err=np.linalg.norm(pred-pr,axis=1)[m]
  h=int(max(pr[:,1].max(),1)+1); w=int(max(pr[:,0].max(),1)+1); inl=int(m.sum()); ratio=inl/max(len(pr),1); cov=_grid_coverage(pr[m],h,w); rm=float(np.sqrt(np.mean(err**2))) if inl else None
- status='VALIDATED' if inl>=12 and ratio>=0.35 and cov>=0.35 and rm is not None and rm<=2.5 else 'INSUFFICIENT_EVIDENCE'
- return MatchResult(method,kr,ks,len(pr),inl,ratio,rm,float(np.median(err)) if inl else None,float(np.percentile(err,95)) if inl else None,cov,H,pr,ps,{'status':status,'grid_coverage':cov})
+ status='VALIDATED' if inl>=_T['min_inliers'] and ratio>=_T['min_inlier_ratio'] and cov>=_T['min_coverage'] and rm is not None and rm<=_T['max_rmse_px'] else 'INSUFFICIENT_EVIDENCE'
+ return MatchResult(method,kr,ks,len(pr),inl,ratio,rm,float(np.median(err)) if inl else None,float(np.percentile(err,95)) if inl else None,cov,H,pr,ps,{'status':status,'grid_coverage':cov},inlier_mask=m)
 
 def _subpixel_refine(img, points):
  # Local image evidence only: refine observed feature locations, never generate

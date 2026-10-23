@@ -52,3 +52,7 @@ CHANDRABHAR-2 uses these packages as installed dependencies via `pip`; no third-
 is vendored or modified in this repository. Each package's own license governs its use and
 redistribution and is not superseded by CHANDRABHAR-2's own license status (see
 [`LICENSE.md`](LICENSE.md)).
+
+## Web platform (3.0.0-web)
+
+The browser release additionally ships Pyodide 0.29.5 and its NumPy / SciPy / OpenCV / Shapely WebAssembly wheels, React, and self-hosted Inter / JetBrains Mono fonts (OFL-1.1). See [`docs/DEPENDENCIES.md`](../docs/DEPENDENCIES.md) for versions and licences, and `public/pyodide/VENDOR_MANIFEST.json` for checksums.

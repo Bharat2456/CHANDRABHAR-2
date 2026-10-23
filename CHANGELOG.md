@@ -10,6 +10,19 @@ Two version lines exist and are tracked separately, exactly as they were before 
   `app/adapters`). Unchanged by the CHANDRABHAR-2 productization pass.
 - **Platform version** (`PLATFORM_VERSION.txt`) — the dashboard/UI/docs/packaging layer.
 
+
+## Platform 3.0.0-web / Engine 8.1.0 — browser-native release
+
+**Platform.** CHANDRABHAR-2 now runs entirely in the browser (React + TypeScript SPA; the Python engine executes in a Web Worker as WebAssembly via Pyodide 0.29.5) and deploys from GitHub to Vercel as a static site. No backend, accounts or telemetry. The Streamlit app (`dashboard.py`, `ui/`) is retained unchanged as the local reference UI.
+
+**Engine 8.1.0 (scientific core).**
+- **Fixed (correctness):** the `.npy` adapter memory-mapped the file at offset 0, so the NumPy header bytes were read as pixel data (images were shifted by the header length). It now parses the header, uses the true data offset, validates size, and rejects Fortran-order/object arrays. Regression test: `tests/test_security_and_adapters.py::test_npy_regression_pixels_exact`. PDS4/ENVI/raw adapters were not affected.
+- **Changed (self-test):** `app/selftest.py` now verifies the recovered transform against the known synthetic transform (≤ 1.5 px) instead of the gate inlier-ratio, which was only reaching its threshold because both test images were identically corrupted by the bug above. Evidence-gate thresholds are **unchanged**.
+- **Added:** `app/safepath.py` (label-supplied names must be plain names inside the workspace; DTD/entity XML refused; size limits), size validation for raw/sidecar and `.npy`, `LazyArray` stream backend (bit-exact with memmap; required in the browser), host-side 64-bit slice reads (Python `seek` is 32-bit in wasm32), `app/core/hooks.py` (progress / evidence capture; no effect on results), `Engine.config()` recorded in every result, deterministic RANSAC seeding, inlier masks on `MatchResult`, `GATE_THRESHOLDS` as the single source of truth, `app/web/bridge.py`, `app/synthetic.py`.
+- **Not changed:** matching cascade, representations, geowarp, geometry mapper, gate thresholds and their semantics.
+
+See `docs/WEB_MIGRATION_PARITY.md` and `docs/WEB_TEST_REPORT.md`.
+
 ## Platform v2.1.0 — Lunar Intelligence Interface (UI/UX redesign)
 
 Presentation layer only. **`app/` is byte-identical to v2.0.0; engine remains v8.0.2.**

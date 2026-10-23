@@ -5,14 +5,19 @@ import numpy as np
 from app.core.physical import plan_common_gsd
 from app.core.representation import modality_rep
 from app.core.matcher import match_representations
-from app.core.evidence import gate
+from app.core.evidence import gate, GATE_THRESHOLDS
+from app.core.hooks import NULL_HOOKS
 from app.io.reader import SceneReader
 from app.geo.mapper import GeometryMapper
 from app.core.geowarp import GeoGrid, warp_reader_to_grid, warp_iirs_rep_to_grid
 
 class Engine:
- def __init__(self,levels=(1.0,1.5,2.5,4.0,6.0),tile_px=512,overlap=0.20):
-  self.levels=levels; self.tile_px=int(tile_px); self.overlap=float(overlap)
+ def __init__(self,levels=(1.0,1.5,2.5,4.0,6.0),tile_px=512,overlap=0.20,ratio=0.78,max_grid_pixels=12_000_000,seed=12345,hooks=None):
+  self.levels=tuple(levels); self.tile_px=int(tile_px); self.overlap=float(overlap); self.ratio=float(ratio); self.max_grid_pixels=int(max_grid_pixels); self.seed=seed; self.hooks=hooks or NULL_HOOKS
+
+ def config(self):
+  """Every parameter that influences a result (recorded in run manifests)."""
+  return {'levels':list(self.levels),'tile_px':self.tile_px,'overlap':self.overlap,'sift_ratio':self.ratio,'max_grid_pixels':self.max_grid_pixels,'rng_seed':self.seed,'gate':dict(GATE_THRESHOLDS)}
 
  def _sanitize_window(self,reader,window):
   H,W=reader.spatial_shape
@@ -153,6 +158,7 @@ class Engine:
   H=min(rh,sh); W=min(rwpx,swpx)
   step=max(1,int(self.tile_px*(1-self.overlap))); tile=self.tile_px
   all_pr=[]; all_ps=[]; kp_r=kp_s=tent=0; tile_diags=[]
+  self.hooks.level_begin(getattr(self,'_lv',0),getattr(self,'_nlv',1),plan.target_gsd_m,H,W,'physical_tiles'); ntot=len(range(0,H,step))*len(range(0,W,step)); nti=0
   for oi in range(0,H,step):
    oi1=min(H,oi+tile)
    for oj in range(0,W,step):
@@ -166,8 +172,10 @@ class Engine:
      ref=self._iirs_rep(rr,self._tile_native_window(rr,(r0,r1,c0,c1),plan.target_gsd_m,oi,oi1,oj,oj1),ref,plan.target_gsd_m)
     if src_spec.sensor.upper()=='IIRS':
      src=self._iirs_rep(sr,self._tile_native_window(sr,(s0,s1,d0,d1),plan.target_gsd_m,oi,oi1,oj,oj1),src,plan.target_gsd_m)
-    res=match_representations(modality_rep(ref,ref_spec.solar_elevation_deg,ref_spec.solar_azimuth_deg),modality_rep(src,src_spec.solar_elevation_deg,src_spec.solar_azimuth_deg))
+    self.hooks.capture(oi,oj,ref,src,None)
+    res=match_representations(modality_rep(ref,ref_spec.solar_elevation_deg,ref_spec.solar_azimuth_deg),modality_rep(src,src_spec.solar_elevation_deg,src_spec.solar_azimuth_deg),self.ratio)
     kp_r+=res.keypoints_ref; kp_s+=res.keypoints_src; tent+=res.tentative_matches
+    nti+=1; self.hooks.tile(nti,ntot,matcher_path=res.diagnostics.get('matcher_path'),matches=res.tentative_matches)
     if res.points_ref.size and res.points_src.size and res.diagnostics.get('independent_correspondence_evidence', True):
      all_pr.append(res.points_ref+np.array([oj,oi],np.float32)); all_ps.append(res.points_src+np.array([oj,oi],np.float32))
     tile_diags.append({'id':f'{oi}:{oj}','shape':[oi1-oi,oj1-oj],'matches':res.tentative_matches,'inliers':res.inliers,'ratio':res.inlier_ratio,'coverage':res.coverage,'rmse_px':res.rmse_px})
@@ -177,7 +185,7 @@ class Engine:
    from app.model import MatchResult
    return MatchResult('TILED-SIFT+RANSAC',kp_r,kp_s,tent,0,0.0,None,None,None,0.0,None,diagnostics={'status':'INSUFFICIENT_EVIDENCE','reason':'no_tile_correspondences','tiles':tile_diags,'physical_grid_shape':[H,W]})
   pr=np.vstack(all_pr).astype(np.float32); ps=np.vstack(all_ps).astype(np.float32)
-  Hm,mask=cv2.findHomography(ps,pr,cv2.RANSAC,3.0,maxIters=10000,confidence=.995)
+  Hm,mask=cv2.findHomography(ps,pr,cv2.RANSAC,GATE_THRESHOLDS['ransac_reproj_px'],maxIters=10000,confidence=.995)
   if Hm is None:
    from app.model import MatchResult
    return MatchResult('TILED-SIFT+RANSAC',kp_r,kp_s,len(pr),0,0.0,None,None,None,0.0,None,pr,ps,{'status':'INSUFFICIENT_EVIDENCE','reason':'global_ransac_failed','tiles':tile_diags,'physical_grid_shape':[H,W]})
@@ -186,7 +194,7 @@ class Engine:
   inl=int(m.sum()); ratio=float(inl/max(len(pr),1)); cov=float(grid.mean()); rm=float(np.sqrt(np.mean(err**2))) if inl else None
   status='VALIDATED' if inl>=12 and ratio>=0.35 and cov>=0.35 and rm is not None and rm<=2.5 else 'INSUFFICIENT_EVIDENCE'
   from app.model import MatchResult
-  return MatchResult('TILED-SIFT+RANSAC',kp_r,kp_s,len(pr),inl,ratio,rm,float(np.median(err)) if inl else None,float(np.percentile(err,95)) if inl else None,cov,Hm,pr,ps,{'status':status,'grid_coverage':cov,'tiles':tile_diags,'physical_grid_shape':[H,W]})
+  return MatchResult('TILED-SIFT+RANSAC',kp_r,kp_s,len(pr),inl,ratio,rm,float(np.median(err)) if inl else None,float(np.percentile(err,95)) if inl else None,cov,Hm,pr,ps,{'status':status,'grid_coverage':cov,'tiles':tile_diags,'physical_grid_shape':[H,W]},inlier_mask=m)
 
  def _intersection_bbox(self,fp_a,fp_b):
   def bounds(fp):
@@ -225,8 +233,9 @@ class Engine:
   if not (rg and sg and Path(rg).exists() and Path(sg).exists() and polygon): return None
   rmap=GeometryMapper(rg); smap=GeometryMapper(sg)
   if not (rmap.ok and smap.ok): return None
-  grid=GeoGrid(polygon,plan.target_gsd_m,max_pixels=12_000_000)
+  grid=GeoGrid(polygon,plan.target_gsd_m,max_pixels=self.max_grid_pixels)
   step=max(1,int(self.tile_px*(1-self.overlap))); all_pr=[]; all_ps=[]; tent=kp_r=kp_s=0; tiles=[]
+  self.hooks.level_begin(getattr(self,'_lv',0),getattr(self,'_nlv',1),grid.target_gsd,grid.height,grid.width,'geographic_warp'); ntot=len(range(0,grid.height,step))*len(range(0,grid.width,step)); nti=0
   for oi in range(0,grid.height,step):
    oi1=min(grid.height,oi+self.tile_px)
    for oj in range(0,grid.width,step):
@@ -242,8 +251,10 @@ class Engine:
     if ref is None or src is None: continue
     ref=np.asarray(ref,np.float32); src=np.asarray(src,np.float32); ref[~mask]=0; src[~mask]=0
     if min(ref.shape[:2])<64 or min(src.shape[:2])<64: continue
-    res=match_representations(modality_rep(ref,ref_spec.solar_elevation_deg,ref_spec.solar_azimuth_deg),modality_rep(src,src_spec.solar_elevation_deg,src_spec.solar_azimuth_deg))
+    self.hooks.capture(oi,oj,ref,src,mask)
+    res=match_representations(modality_rep(ref,ref_spec.solar_elevation_deg,ref_spec.solar_azimuth_deg),modality_rep(src,src_spec.solar_elevation_deg,src_spec.solar_azimuth_deg),self.ratio)
     kp_r+=res.keypoints_ref; kp_s+=res.keypoints_src; tent+=res.tentative_matches
+    nti+=1; self.hooks.tile(nti,ntot,matcher_path=res.diagnostics.get('matcher_path'),matches=res.tentative_matches)
     if res.points_ref.size and res.points_src.size and res.diagnostics.get('independent_correspondence_evidence', True):
      all_pr.append(res.points_ref+np.array([oj,oi],np.float32)); all_ps.append(res.points_src+np.array([oj,oi],np.float32))
     tiles.append({'id':f'{oi}:{oj}','shape':[oi1-oi,oj1-oj],'matches':res.tentative_matches,'inliers':res.inliers,'ratio':res.inlier_ratio,'coverage':res.coverage,'rmse_px':res.rmse_px,'matcher_path':res.diagnostics.get('matcher_path')})
@@ -259,7 +270,11 @@ class Engine:
   return res
 
  def register(self,ref_spec,src_spec,name='pair'):
+  import cv2
+  try: cv2.setRNGSeed(int(self.seed))  # RANSAC reproducibility
+  except Exception: pass
   t=time.time(); rr=SceneReader(ref_spec); sr=SceneReader(src_spec); levels=[]
+  self.hooks.stage('geometry_intersection')
   aoi,gd=self._geometry_intersection_bbox(ref_spec,src_spec)
   intersection_polygon=(gd or {}).get('intersection_polygon') if isinstance(gd,dict) else None
   if aoi is None:
@@ -272,17 +287,20 @@ class Engine:
    rw,rd0=None,{'source':'full_scene_no_pair_footprint'}; sw,sd0=None,{'source':'full_scene_no_pair_footprint'}
   else:
    rw,rd0=self._auto_window(ref_spec,aoi,intersection_polygon); sw,sd0=self._auto_window(src_spec,aoi,intersection_polygon)
-  for plan in plan_common_gsd(ref_spec.gsd_m,src_spec.gsd_m,levels=self.levels):
+  plans=plan_common_gsd(ref_spec.gsd_m,src_spec.gsd_m,levels=self.levels); self._nlv=len(plans)
+  for li,plan in enumerate(plans):
+   self._lv=li; self.hooks.stage('matching_level',level=li+1,levels=len(plans),target_gsd_m=plan.target_gsd_m)
    res=self._geo_tile_match(rr,sr,plan,ref_spec,src_spec,intersection_polygon) if intersection_polygon else None
    if res is None:
     res=self._tile_match(rr,sr,plan,rw,sw,ref_spec,src_spec)
    res.diagnostics.update({'target_gsd_m':plan.target_gsd_m,'actual_ref_gsd_m':float(plan.target_gsd_m),'actual_src_gsd_m':float(plan.target_gsd_m),'rmse_m':(res.rmse_px*float(plan.target_gsd_m) if res.rmse_px is not None else None),'physical_scale_error_fraction_ref':0.0,'physical_scale_error_fraction_src':0.0})
-   levels.append(res)
+   levels.append(res); self.hooks.level_end(li,res)
    if res.diagnostics.get('status')=='VALIDATED': break
+  self.hooks.stage('evidence_gate')
   best=max(levels,key=lambda x:(x.inlier_ratio,x.inliers,x.coverage))
   cascade=[dict(x.diagnostics) for x in levels]
-  best.diagnostics.update({'experiment':name,'elapsed_s':time.time()-t,'pair_aoi_latlon':aoi,'pair_aoi_method':gd,'scale_cascade':cascade,'physical_gsd_invariant':True,'auto_aoi_reference':rd0,'auto_aoi_source':sd0,'status':gate(best)['status'],'gate_reasons':gate(best)['reasons'],'note':'Physical GSD is preserved during matching. Computational tiling changes memory footprint only; no post-resize stride is used to disguise a coarser effective GSD.'})
+  best.diagnostics.update({'experiment':name,'elapsed_s':time.time()-t,'pair_aoi_latlon':aoi,'pair_aoi_method':gd,'scale_cascade':cascade,'physical_gsd_invariant':True,'engine_config':self.config(),'auto_aoi_reference':rd0,'auto_aoi_source':sd0,'status':gate(best)['status'],'gate_reasons':gate(best)['reasons'],'note':'Physical GSD is preserved during matching. Computational tiling changes memory footprint only; no post-resize stride is used to disguise a coarser effective GSD.'})
   return best
 
  def save(self,result,path):
-  path=Path(path); path.parent.mkdir(parents=True,exist_ok=True); d={k:v for k,v in result.__dict__.items() if k not in ('homography','points_ref','points_src')}; d['homography']=result.homography.tolist() if result.homography is not None else None; path.write_text(json.dumps(d,indent=2,default=str))
+  path=Path(path); path.parent.mkdir(parents=True,exist_ok=True); d={k:v for k,v in result.__dict__.items() if k not in ('homography','points_ref','points_src','inlier_mask')}; d['homography']=result.homography.tolist() if result.homography is not None else None; path.write_text(json.dumps(d,indent=2,default=str))

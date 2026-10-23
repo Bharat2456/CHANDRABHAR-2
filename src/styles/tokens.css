@@ -1,0 +1,40 @@
+/* Design tokens. Palettes mirror ui/tokens.py ("Orbital Night" / "Lunar Daylight"); semantics: green = gate passed only, red = errors only. */
+:root {
+  color-scheme: dark;
+  --bg: #07090d; --surface: #0d1117; --surface-2: #131922; --surface-3: #1a2230; --border: #26303f; --border-strong: #3a475a;
+  --text: #e8edf4; --muted: #98a3b5; --faint: #6c778a;
+  --accent: #f5a524; --accent-ink: #1a1203; --info: #38b6e8;
+  --ok: #3fb950; --warn: #e3b341; --bad: #f85149; --mute: #98a3b5;
+  --ok-bg: rgba(63,185,80,.14); --warn-bg: rgba(227,179,65,.14); --bad-bg: rgba(248,81,73,.14); --info-bg: rgba(56,182,232,.14); --mute-bg: rgba(152,163,181,.12);
+  --ohrc: #f5a524; --tmc2: #38b6e8; --iirs: #6fd3b7;
+  --focus: #7cc7ff; --shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 8px 24px rgba(0,0,0,.35);
+  --font-sans: 'Inter Variable', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'Cascadia Mono', Consolas, monospace;
+  --r-1: 4px; --r-2: 8px; --r-3: 12px;
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px;
+  --t-xs: .75rem; --t-sm: .8125rem; --t-md: .9375rem; --t-lg: 1.125rem; --t-xl: 1.5rem; --t-2xl: 2rem;
+  --nav-w: 248px; --top-h: 56px; --dur: 160ms;
+  --canvas-bg: #05070a;
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f4f1ea; --surface: #ffffff; --surface-2: #eeeae0; --surface-3: #e6e1d4; --border: #d9d4c7; --border-strong: #b9b3a3;
+  --text: #14181f; --muted: #5a6473; --faint: #7d8696;
+  --accent: #9a5000; --accent-ink: #ffffff; --info: #1f4e8c;
+  --ok: #1a7f37; --warn: #8a5a00; --bad: #cf222e; --mute: #5a6473;
+  --ok-bg: rgba(26,127,55,.10); --warn-bg: rgba(138,90,0,.10); --bad-bg: rgba(207,34,46,.09); --info-bg: rgba(31,78,140,.09); --mute-bg: rgba(90,100,115,.09);
+  --ohrc: #9a5000; --tmc2: #1f4e8c; --iirs: #13795b; --focus: #0b5cc4;
+  --shadow: 0 1px 2px rgba(20,24,31,.06); --canvas-bg: #1b1f27;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --bg: #f4f1ea; --surface: #ffffff; --surface-2: #eeeae0; --surface-3: #e6e1d4; --border: #d9d4c7; --border-strong: #b9b3a3;
+    --text: #14181f; --muted: #5a6473; --faint: #7d8696;
+    --accent: #9a5000; --accent-ink: #ffffff; --info: #1f4e8c;
+    --ok: #1a7f37; --warn: #8a5a00; --bad: #cf222e; --mute: #5a6473;
+    --ok-bg: rgba(26,127,55,.10); --warn-bg: rgba(138,90,0,.10); --bad-bg: rgba(207,34,46,.09); --info-bg: rgba(31,78,140,.09); --mute-bg: rgba(90,100,115,.09);
+    --ohrc: #9a5000; --tmc2: #1f4e8c; --iirs: #13795b; --focus: #0b5cc4;
+    --shadow: 0 1px 2px rgba(20,24,31,.06); --canvas-bg: #1b1f27;
+  }
+}

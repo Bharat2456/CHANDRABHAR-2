@@ -1,0 +1,333 @@
+{
+  "ranAt": "2026-10-23T07:56:31.953Z",
+  "browser": "HeadlessChrome/153.0.8010.0",
+  "failed": 0,
+  "total": 65,
+  "results": [
+    {
+      "name": "app loads and renders heading",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "route #/overview renders \"Lunar image registration workspace\"",
+      "ok": true,
+      "detail": "Lunar image registration workspace"
+    },
+    {
+      "name": "route #/workspace renders \"Data workspace\"",
+      "ok": true,
+      "detail": "Data workspace"
+    },
+    {
+      "name": "route #/registration renders \"Image registration\"",
+      "ok": true,
+      "detail": "Image registration"
+    },
+    {
+      "name": "route #/lab renders \"Correspondence lab\"",
+      "ok": true,
+      "detail": "Correspondence lab"
+    },
+    {
+      "name": "route #/evidence renders \"Evidence & results\"",
+      "ok": true,
+      "detail": "Evidence & results"
+    },
+    {
+      "name": "route #/reports renders \"Reports & export\"",
+      "ok": true,
+      "detail": "Reports & export"
+    },
+    {
+      "name": "route #/settings renders \"Settings & about\"",
+      "ok": true,
+      "detail": "Settings & about"
+    },
+    {
+      "name": "no horizontal overflow on any route @1360px",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no horizontal overflow on any route @820px",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no horizontal overflow on any route @390px",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "direct navigation / refresh on a deep link works",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "first Tab stop is the skip link",
+      "ok": true,
+      "detail": "Skip to content"
+    },
+    {
+      "name": "focus indicator is visible on nav links",
+      "ok": true,
+      "detail": "solid 2px"
+    },
+    {
+      "name": "landmarks present (header, nav, main)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "status region announces engine state (aria-live)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "engine booted and products inspected",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "OHRC and TMC-2 PDS4 products detected with GSD",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "ENVI, NumPy and raw+sidecar products also detected",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "geometry CSV associated with PDS4 products",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "NumPy product without GSD prompts for override",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "product preview renders (decimated, via stream reads)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pair uses TRUE swath intersection (not bbox)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "compatibility panel shows GSD ratio and overlap area",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "live progress panel shown while running",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "run completes",
+      "ok": true,
+      "detail": "6.8s"
+    },
+    {
+      "name": "UI stayed responsive during run (page JS thread served polls)",
+      "ok": true,
+      "detail": "Computing true swath intersection | Common-grid matching · level 1 of up to 1 | Packaging evidence · level 1 of up to 1"
+    },
+    {
+      "name": "progress bar is determinate only with measured value (else indeterminate)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "evidence shows four separate statements",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "gate passed on synthetic geo-warped pair, ground truth still \"Not established\"",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "limitation statement is displayed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "recovered translation < 1 grid px on known geometry",
+      "ok": true,
+      "detail": "-0.055, -0.190 px ≈ -0.28, -0.95 m"
+    },
+    {
+      "name": "lab canvas renders real imagery (not blank)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "keyboard zoom/pan changes the view",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "overlay mode renders",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "lab legend distinguishes inliers/outliers by shape+text",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "metrics.json valid with gate + claims",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "summary.csv has header, thresholds and gate rows",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "correspondences.csv rows match inlier flags",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "evidence PNG is a valid PNG with real size",
+      "ok": true,
+      "detail": "231038"
+    },
+    {
+      "name": "manifest includes versions, params, sha256 of label+geometry, statement",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "ZIP bundle is valid (CRC-checked) and contains all outputs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "every request is same-origin (no third-party hosts at all)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no non-GET network requests (nothing is POSTed anywhere)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no request URL contains mission file names or fixture content",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no Content-Security-Policy violations in the page",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no console errors or warnings",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "production headers present (CSP w/o unsafe-eval, nosniff, no-referrer)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "wasm served with application/wasm",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "reset workspace clears files after confirmation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "truncated binary is detected with an actionable message",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "3.2 GB product inspected via slices (size check without loading)",
+      "ok": true,
+      "detail": "0.1s"
+    },
+    {
+      "name": "3.2 GB product previews without crashing the tab",
+      "ok": true,
+      "detail": "2.0s total"
+    },
+    {
+      "name": "main-thread JS heap stays small",
+      "ok": true,
+      "detail": "10 MB"
+    },
+    {
+      "name": "cancel stops the run and reports it",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "engine restarts cleanly after cancel (files preserved)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "a new run succeeds after cancellation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "opt-in saved result survives a reload (IndexedDB)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "\"Clear all local data\" removes saved results and prefs",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "IndexedDB database deleted",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "theme toggle sets data-theme",
+      "ok": true,
+      "detail": "dark"
+    },
+    {
+      "name": "theme preference persists across reload",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "reduced-motion handling present in shipped CSS (media query + manual setting)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "mobile (touch, 390px) page has no horizontal overflow",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "name": "mobile bottom navigation is visible",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

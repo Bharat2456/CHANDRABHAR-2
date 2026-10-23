@@ -3,6 +3,7 @@ from pathlib import Path
 import re, xml.etree.ElementTree as ET
 import numpy as np
 from app.model import SceneSpec, ArraySpec
+from app.safepath import parse_xml_safe, read_text_limited, clean_name, confine, checked_shape, MAX_SNIFF_BYTES
 _DTYPE={"UnsignedByte":np.dtype("u1"),"UnsignedLSB2":np.dtype("<u2"),"UnsignedMSB2":np.dtype(">u2"),"SignedLSB2":np.dtype("<i2"),"SignedMSB2":np.dtype(">i2"),"UnsignedLSB4":np.dtype("<u4"),"UnsignedMSB4":np.dtype(">u4"),"SignedLSB4":np.dtype("<i4"),"SignedMSB4":np.dtype(">i4"),"IEEE754LSBSingle":np.dtype("<f4"),"IEEE754MSBSingle":np.dtype(">f4"),"IEEE754LSBDouble":np.dtype("<f8"),"IEEE754MSBDouble":np.dtype(">f8")}
 def local(t): return t.rsplit('}',1)[-1]
 def text(root,name,default=None):
@@ -36,21 +37,24 @@ def footprint(root):
 class PDS4Adapter:
     name='pds4'
     @classmethod
-    def can_open(cls,path): return path.suffix.lower()=='.xml' and 'logical_identifier' in path.read_text(errors='ignore')[:200000]
+    def can_open(cls,path): return path.suffix.lower()=='.xml' and 'logical_identifier' in read_text_limited(path,head=MAX_SNIFF_BYTES)
     @classmethod
-    def inspect(cls,path):
-        path=Path(path); root=ET.parse(path).getroot(); logical=text(root,'logical_identifier',path.stem)
+    def inspect(cls,path,root=None):
+        path=Path(path); ws=Path(root) if root is not None else None; root=parse_xml_safe(path); logical=text(root,'logical_identifier',path.stem)
         product_id=logical.split(':')[-1]; fn=text(root,'file_name')
         if not fn: raise ValueError('PDS4 label has no file_name')
+        fn=clean_name(fn)  # label-supplied names must be plain file names (no traversal)
         candidates=[path.parent/fn,path.parent.parent.parent.parent/'data'/'calibrated'/path.parent.name/fn]
         data=next((p for p in candidates if p.exists()),None)
         if data is None:
-            hits=list(path.parent.rglob(fn)); data=hits[0] if hits else None
+            scope=ws if ws is not None else path.parent
+            hits=sorted(scope.rglob(fn)); data=hits[0] if hits else None
+        if data is not None: confine(ws,data)
         if data is None: raise FileNotFoundError(f'Data file {fn} not found for {path}')
         dtname=text(root,'data_type'); dt=_DTYPE.get(dtname)
         if dt is None: raise ValueError(f'Unsupported PDS4 data_type: {dtname}')
-        ax=axes(root); shape=tuple(x[1] for x in ax)
-        offset=int(float(text(root,'offset',0) or 0)); expected=offset+int(np.prod(shape))*dt.itemsize
+        ax=axes(root); shape=checked_shape(tuple(x[1] for x in ax))
+        offset=int(float(text(root,'offset',0) or 0)); expected=offset+int(np.prod(shape,dtype=object))*dt.itemsize
         actual=data.stat().st_size
         if expected!=actual: raise ValueError(f'PDS4 binary size mismatch: expected {expected}, actual {actual}')
         meta={'logical_identifier':logical,'declared_file_size':int(float(text(root,'file_size',actual) or actual)),'data_type_name':dtname,'axis_names':[x[0] for x in ax],'footprint':footprint(root)}
@@ -59,6 +63,7 @@ class PDS4Adapter:
         # acquisition stem with _g_grd_ in place of _d_img_.  Fall back to a
         # recursive search so the adapter remains usable after archive re-layout.
         archive_root=path.parent.parent.parent.parent if len(path.parents)>=4 else path.parent
+        if ws is not None and not (ws==archive_root or ws in archive_root.parents): archive_root=ws  # never search above the workspace
         geos=[]
         if archive_root.exists():
             geo_dir=archive_root/'geometry'/'calibrated'/path.parent.name

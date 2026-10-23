@@ -1,0 +1,44 @@
+{
+  "pyodide": "0.29.5",
+  "tarball_sha256": "7ae170fe06a68d11f15cbf77fc78488b4712cfbfade81c87e9b4010973cd67c8",
+  "files": {
+    "pyodide.mjs": {
+      "bytes": 17616,
+      "sha256": "510ca14305230018f50c40fb81be673afd68080e70ce7733fcce6600dd6a1714"
+    },
+    "pyodide.asm.js": {
+      "bytes": 1074322,
+      "sha256": "356c42f69e1695397e9d8670bd3c2e678248cde76e18bdae1731e848537b47d7"
+    },
+    "pyodide.asm.wasm": {
+      "bytes": 8647684,
+      "sha256": "54309a5a2cfd757b1f0fdbc9093c92503f7b341500110329d932487183912718"
+    },
+    "python_stdlib.zip": {
+      "bytes": 2424003,
+      "sha256": "831fd1e535084b972f87c6a35275de3d236efd5166f5e77ce89497710635e73c"
+    },
+    "numpy-2.2.5-cp313-cp313-pyemscripten_2025_0_wasm32.whl": {
+      "bytes": 2823762,
+      "sha256": "800c98edc0c864dfa49f07005680c699b4b42b84eae1f8cb19d35b3634e7f05c"
+    },
+    "opencv_python-4.11.0.86-cp313-cp313-pyemscripten_2025_0_wasm32.whl": {
+      "bytes": 10635394,
+      "sha256": "eb9feb15145b633f2bdc7e9a4758d73dab5be2904d34433391c86e8734c033d9"
+    },
+    "scipy-1.14.1-cp313-cp313-pyemscripten_2025_0_wasm32.whl": {
+      "bytes": 16426457,
+      "sha256": "7a60ad5e52acd8d8059f4acc0932d701c3e07723d82e567523dd1a6e0e85ec3e"
+    },
+    "shapely-2.0.7-cp313-cp313-pyemscripten_2025_0_wasm32.whl": {
+      "bytes": 832503,
+      "sha256": "586daa7290c2d309f9e8d14589d4aa940b1d84502defb3adecc23e17897e476d"
+    }
+  },
+  "packages": {
+    "numpy": "2.2.5",
+    "opencv-python": "4.11.0.86",
+    "scipy": "1.14.1",
+    "shapely": "2.0.7"
+  }
+}
