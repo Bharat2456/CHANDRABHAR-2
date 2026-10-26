@@ -1,0 +1,25 @@
+{
+  "opencv": "4.13.0",
+  "grid_hw": [
+    191,
+    199
+  ],
+  "n_correspondences": 201,
+  "coefficient_error_to_displacement_px": {
+    "dA[0][0]=0.002": 0.398,
+    "dA[0][1]=0.002": 0.382,
+    "dA[1][0]=0.002": 0.398,
+    "dA[1][1]=0.002": 0.382
+  },
+  "bootstrap_500": {
+    "displacement_px": {
+      "median": 1.111,
+      "p95": 2.526
+    },
+    "max_abs_dA": {
+      "median": 0.008844274586922371,
+      "p95": 0.02338676718899573
+    },
+    "fraction_dA_ge_0.002": 0.988
+  }
+}

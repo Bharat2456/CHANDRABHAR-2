@@ -11,6 +11,13 @@ Two version lines exist and are tracked separately, exactly as they were before 
 - **Platform version** (`PLATFORM_VERSION.txt`) — the dashboard/UI/docs/packaging layer.
 
 
+## Platform 3.0.1-web — CI parity fix (engine unchanged, 8.1.0)
+
+- **Fixed (test, not engine):** `engine-parity` asserted native-vs-WASM agreement per homography coefficient (< 0.002), which is tighter than the transform can be resolved (0.002 ≈ 0.4 px on the 199×191 px parity grid vs. estimator sampling uncertainty median 1.1 px) and failed in CI at 0.00213. It now bounds the worst-case displacement over the common grid (< 0.5 px) and prints complete diagnostics on failure. Analysis: `docs/WEB_PARITY_ANALYSIS.md`.
+- **CI:** native reference libraries pinned to the WebAssembly runtime's versions (`requirements-ci.txt`, drift-checked by `tests-web/ci-pins.test.ts`); non-blocking `latest-deps` job; diagnostics artifacts; actions upgraded to Node 24 runtimes (`checkout@v6`, `setup-python@v6`, `setup-node@v6`, `upload-artifact@v6`); project Node 22.
+- **Corrected claim:** `cv2.setRNGSeed` does not affect `findHomography(RANSAC)`; determinism comes from OpenCV's fixed internal generator. UI help text, docs and a new test (`test_ransac_determinism_does_not_depend_on_global_seed`) updated accordingly. The recorded seed remains in manifests.
+- Added `tools/parity_probe.py`, `tools/parity_estimator_uncertainty.py`.
+
 ## Platform 3.0.0-web / Engine 8.1.0 — browser-native release
 
 **Platform.** CHANDRABHAR-2 now runs entirely in the browser (React + TypeScript SPA; the Python engine executes in a Web Worker as WebAssembly via Pyodide 0.29.5) and deploys from GitHub to Vercel as a static site. No backend, accounts or telemetry. The Streamlit app (`dashboard.py`, `ui/`) is retained unchanged as the local reference UI.
@@ -18,7 +25,7 @@ Two version lines exist and are tracked separately, exactly as they were before 
 **Engine 8.1.0 (scientific core).**
 - **Fixed (correctness):** the `.npy` adapter memory-mapped the file at offset 0, so the NumPy header bytes were read as pixel data (images were shifted by the header length). It now parses the header, uses the true data offset, validates size, and rejects Fortran-order/object arrays. Regression test: `tests/test_security_and_adapters.py::test_npy_regression_pixels_exact`. PDS4/ENVI/raw adapters were not affected.
 - **Changed (self-test):** `app/selftest.py` now verifies the recovered transform against the known synthetic transform (≤ 1.5 px) instead of the gate inlier-ratio, which was only reaching its threshold because both test images were identically corrupted by the bug above. Evidence-gate thresholds are **unchanged**.
-- **Added:** `app/safepath.py` (label-supplied names must be plain names inside the workspace; DTD/entity XML refused; size limits), size validation for raw/sidecar and `.npy`, `LazyArray` stream backend (bit-exact with memmap; required in the browser), host-side 64-bit slice reads (Python `seek` is 32-bit in wasm32), `app/core/hooks.py` (progress / evidence capture; no effect on results), `Engine.config()` recorded in every result, deterministic RANSAC seeding, inlier masks on `MatchResult`, `GATE_THRESHOLDS` as the single source of truth, `app/web/bridge.py`, `app/synthetic.py`.
+- **Added:** `app/safepath.py` (label-supplied names must be plain names inside the workspace; DTD/entity XML refused; size limits), size validation for raw/sidecar and `.npy`, `LazyArray` stream backend (bit-exact with memmap; required in the browser), host-side 64-bit slice reads (Python `seek` is 32-bit in wasm32), `app/core/hooks.py` (progress / evidence capture; no effect on results), `Engine.config()` recorded in every result, inlier masks on `MatchResult`, `GATE_THRESHOLDS` as the single source of truth, `app/web/bridge.py`, `app/synthetic.py`.
 - **Not changed:** matching cascade, representations, geowarp, geometry mapper, gate thresholds and their semantics.
 
 See `docs/WEB_MIGRATION_PARITY.md` and `docs/WEB_TEST_REPORT.md`.

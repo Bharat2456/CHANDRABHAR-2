@@ -61,3 +61,17 @@ def test_documented_limit_identical_copy_passes_gate():
     from app.core.matcher import match_representations
     rng=np.random.default_rng(0); n=rng.random((300,300)).astype(np.float32)
     assert match_representations(n,n.copy()).diagnostics['status']=='VALIDATED'
+
+
+def test_ransac_determinism_does_not_depend_on_global_seed():
+    """OpenCV's findHomography(RANSAC) uses a fixed internal RNG: identical input => identical output,
+    and cv2.setRNGSeed has NO influence. (Documents what actually makes runs repeatable; fails if OpenCV changes this.)"""
+    import cv2
+    rng = np.random.default_rng(4); src = rng.uniform(0, 400, (120, 2)).astype(np.float32)
+    H = np.array([[1.001, -0.002, 0.7], [0.002, 0.999, -0.4], [0, 0, 1]]); dst = cv2.perspectiveTransform(src.reshape(-1, 1, 2), H).reshape(-1, 2)
+    dst += rng.normal(0, 0.3, dst.shape).astype(np.float32); dst[:30] = rng.uniform(0, 400, (30, 2))      # 25 % gross outliers
+    outs = set()
+    for seed in (0, 1, 12345, 2**31 - 1):
+        cv2.setRNGSeed(seed); M, m = cv2.findHomography(src, dst.astype(np.float32), cv2.RANSAC, 3.0, maxIters=10000, confidence=.995)
+        outs.add((M.tobytes(), m.tobytes()))
+    assert len(outs) == 1

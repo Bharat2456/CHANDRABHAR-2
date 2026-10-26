@@ -1,0 +1,139 @@
+{
+  "measured_utc": "2026-10-24T02:14:29.739Z",
+  "data": "synthetic fixtures (app/synthetic.py), levels=[1.0]",
+  "native": {
+    "env": {
+      "python": "3.12.3",
+      "numpy": "2.4.4",
+      "opencv": "4.13.0",
+      "scipy": "1.17.1",
+      "shapely": "2.2.0",
+      "platform": "Linux-6.18.44-fc-v153-x86_64-with-glibc2.39",
+      "opencv_cpu_features": [
+        "Baseline:                    SSE SSE2 SSE3",
+        "Dispatched code generation:  SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX"
+      ]
+    },
+    "metrics": {
+      "method": "GEO-WARP-MULTIMODAL+RANSAC",
+      "keypoints_ref": 691,
+      "keypoints_src": 982,
+      "tentative_matches": 201,
+      "inliers": 174,
+      "inlier_ratio": 0.8656716417910447,
+      "coverage": 1,
+      "rmse_px": 1.0376759767532349,
+      "median_error_px": 0.4504249095916748,
+      "p95_error_px": 2.497925043106079,
+      "rmse_m": 5.188379883766174,
+      "target_gsd_m": 5
+    },
+    "homography": [
+      [
+        1.001890471395661,
+        -0.0027200269360410723,
+        -0.05535994369789701
+      ],
+      [
+        0.0016767004702030088,
+        0.9994053610600201,
+        -0.189830044533048
+      ],
+      [
+        0.0000012613221082062096,
+        -0.000003720492334188863,
+        1
+      ]
+    ],
+    "selftest": {
+      "passed": true,
+      "inliers": 363,
+      "ratio": 0.3327222731439047,
+      "coverage": 1,
+      "rmse_px": 0.7363008260726929,
+      "known_transform_error_px": 0.1196521669626236,
+      "gate_status": "INSUFFICIENT_EVIDENCE",
+      "elapsed_s": 4.142838001251221,
+      "note": "Synthetic engine self-test; not mission validation."
+    }
+  },
+  "wasm": {
+    "engine": {
+      "python": "3.13.2",
+      "platform": "emscripten",
+      "numpy": "2.2.5",
+      "opencv": "4.11.0",
+      "scipy": "1.14.1",
+      "shapely": "2.0.7",
+      "gate": {
+        "min_tentative_matches": 8,
+        "min_inliers": 12,
+        "min_inlier_ratio": 0.35,
+        "min_coverage": 0.35,
+        "max_rmse_px": 2.5,
+        "ransac_reproj_px": 3
+      },
+      "io_backend": "stream"
+    },
+    "metrics": {
+      "method": "GEO-WARP-MULTIMODAL+RANSAC",
+      "keypoints_ref": 691,
+      "keypoints_src": 982,
+      "tentative_matches": 201,
+      "inliers": 164,
+      "inlier_ratio": 0.8159203980099502,
+      "coverage": 1,
+      "rmse_px": 0.8929335474967957,
+      "median_error_px": 0.4424285888671875,
+      "p95_error_px": 1.9734255075454712,
+      "rmse_m": 4.464667737483978,
+      "target_gsd_m": 5
+    },
+    "homography": [
+      [
+        1.0018906294119998,
+        -0.002719850740974692,
+        -0.05536717278408338
+      ],
+      [
+        0.001676615489205697,
+        0.9994057428723792,
+        -0.18983467838589385
+      ],
+      [
+        0.0000012619859000851203,
+        -0.000003719400662220929,
+        1
+      ]
+    ],
+    "selftest": {
+      "passed": true,
+      "inliers": 363,
+      "ratio": 0.3348708487084871,
+      "coverage": 1,
+      "rmse_px": 0.7323243618011475,
+      "known_transform_error_px": 0.12528380751609802,
+      "gate_status": "INSUFFICIENT_EVIDENCE",
+      "elapsed_s": 7.937000036239624,
+      "note": "Synthetic engine self-test; not mission validation."
+    }
+  },
+  "pixel_windows_compared": 10,
+  "transform_displacement_px": 0.00003897579749625582,
+  "coefficient_deltas": {
+    "H[0][0]": 1.5801633890255573e-7,
+    "H[0][1]": 1.7619506638031843e-7,
+    "H[1][0]": -8.498099731183394e-8,
+    "H[1][1]": 3.818123590626499e-7,
+    "H[0][2]": -0.000007229086186368028,
+    "H[1][2]": -0.000004633852845853381,
+    "H[2][0]": 6.637918789107094e-10,
+    "H[2][1]": 1.091671967934028e-9
+  },
+  "deltas": {
+    "inliers": -10,
+    "rmse_px": -0.1447424292564392,
+    "tx_px": -0.000007229086186368028,
+    "ty_px": -0.000004633852845853381
+  }
+}

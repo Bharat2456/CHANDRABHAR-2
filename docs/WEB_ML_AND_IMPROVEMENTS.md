@@ -14,7 +14,7 @@ The hot spots (SIFT, ECC, warping) live inside OpenCV WASM; there is no WebGPU p
 |---|---|
 | Real tile-level progress, stage reporting, cancellation, crash recovery | E2E tests |
 | Bounded memory: stream reads, capped grid with explicit warning, size/geometry limits | 3.2 GB E2E, lazy-array tests |
-| Reproducibility: RANSAC seeded; every parameter recorded (`Engine.config()`) | `test_runs_are_reproducible`, WASM repeat test |
+| Reproducibility: RANSAC is deterministic for identical input (fixed internal OpenCV RNG; the recorded seed does not influence it); every parameter recorded (`Engine.config()`) | `test_runs_are_reproducible`, WASM repeat test |
 | Method traceability: matcher path per tile, levels attempted, overlap method | Evidence page, manifest |
 | Single source of truth for gate thresholds | `test_gate_thresholds_single_source` |
 | Corrected `.npy` pixel-offset bug | regression test |

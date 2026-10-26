@@ -271,7 +271,7 @@ class Engine:
 
  def register(self,ref_spec,src_spec,name='pair'):
   import cv2
-  try: cv2.setRNGSeed(int(self.seed))  # RANSAC reproducibility
+  try: cv2.setRNGSeed(int(self.seed))  # global OpenCV RNG (note: findHomography(RANSAC) uses a fixed internal RNG and ignores this; determinism comes from that)
   except Exception: pass
   t=time.time(); rr=SceneReader(ref_spec); sr=SceneReader(src_spec); levels=[]
   self.hooks.stage('geometry_intersection')

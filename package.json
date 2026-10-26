@@ -1,11 +1,13 @@
 {
   "name": "chandrabhar-2-web",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "private": true,
   "description": "CHANDRABHAR-2 browser-native lunar image-registration workspace (Python engine running in WebAssembly)",
   "license": "SEE LICENSE IN LICENSE.md",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "node scripts/build-engine-bundle.mjs && vite",
     "build": "node scripts/build-engine-bundle.mjs && node scripts/check-assets.mjs && tsc -b && vite build",

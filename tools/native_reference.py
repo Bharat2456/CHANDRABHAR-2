@@ -4,6 +4,7 @@ import json, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import app.web.bridge as b
+import numpy, cv2, scipy, shapely, platform
 from app.synthetic import build_archive, build_misc
 
 root = Path(sys.argv[1]); root.mkdir(parents=True, exist_ok=True)
@@ -20,4 +21,6 @@ r = json.loads(b.run_registration(ohrc, tmc, json.dumps({'levels': [1.0]}), lamb
 out['ref_key'], out['src_key'] = ohrc, tmc
 out['registration'] = {'status': r['status'], 'metrics': r['metrics'], 'homography': r['homography']['matrix'], 'grid': r['grid'], 'geometry_status': r['pair_geometry']['status'], 'area_km2': r['pair_geometry']['area_km2']}
 out['selftest'] = json.loads(b.run_selftest())
+out['env'] = {'python': platform.python_version(), 'numpy': numpy.__version__, 'opencv': cv2.__version__, 'scipy': scipy.__version__, 'shapely': shapely.__version__, 'platform': platform.platform(),
+              'opencv_cpu_features': [l.strip() for l in cv2.getBuildInformation().splitlines() if 'Baseline' in l or 'Dispatched' in l][:2]}
 print(json.dumps(out))
