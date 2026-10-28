@@ -1,0 +1,1 @@
+{"cv2": "4.13.0", "noise_f32": {"max_abs_err_vs_exact": 5.37177, "rms_err": 1.05968, "best_apparent_offset(dx,dy)": [-0.0, -0.0], "rms_at_best": 1.05968}, "smooth_f32": {"max_abs_err_vs_exact": 0.18725, "rms_err": 0.05716, "best_apparent_offset(dx,dy)": [-0.0, -0.0], "rms_at_best": 0.05716}}

@@ -1,7 +1,10 @@
-* text=auto eol=lf
-*.bat text eol=crlf
-*.ps1 text eol=crlf
+# Normalise text, but NEVER touch the vendored WebAssembly runtime: its SHA-256 values are verified at build time
+# (scripts/check-assets.mjs); a CRLF conversion on Windows would corrupt them.
+* text=auto
+public/pyodide/** -text
+*.wasm binary
+*.whl binary
+*.zip binary
 *.png binary
-*.jpg binary
-*.jpeg binary
-*.pdf binary
+*.woff2 binary
+*.sh text eol=lf

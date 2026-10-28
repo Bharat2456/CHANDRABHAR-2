@@ -1,14 +1,15 @@
 {
-  "measured_utc": "2026-10-24T02:12:37.755Z",
+  "measured_utc": "2026-10-28T02:34:19.333Z",
   "data": "synthetic fixtures (app/synthetic.py), levels=[1.0]",
   "native": {
     "env": {
       "python": "3.12.3",
       "numpy": "2.2.5",
       "opencv": "4.11.0",
+      "opencv_remap_mode": "fixed-point-1/32px",
       "scipy": "1.14.1",
       "shapely": "2.0.7",
-      "platform": "Linux-6.18.44-fc-v153-x86_64-with-glibc2.39",
+      "platform": "Linux-6.18.44-fc-v180-x86_64-with-glibc2.39",
       "opencv_cpu_features": [
         "Baseline:                    SSE SSE2 SSE3",
         "Dispatched code generation:  SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX"
@@ -50,10 +51,10 @@
       "inliers": 366,
       "ratio": 0.3354720439963336,
       "coverage": 1,
-      "rmse_px": 0.8016597032546997,
-      "known_transform_error_px": 0.11965186893939972,
+      "rmse_px": 0.8016565442085266,
+      "known_transform_error_px": 0.11960115283727646,
       "gate_status": "INSUFFICIENT_EVIDENCE",
-      "elapsed_s": 3.100773811340332,
+      "elapsed_s": 2.4458494186401367,
       "note": "Synthetic engine self-test; not mission validation."
     }
   },
@@ -114,7 +115,7 @@
       "rmse_px": 0.7323243618011475,
       "known_transform_error_px": 0.12528380751609802,
       "gate_status": "INSUFFICIENT_EVIDENCE",
-      "elapsed_s": 7.661999940872192,
+      "elapsed_s": 5.586999893188477,
       "note": "Synthetic engine self-test; not mission validation."
     }
   },

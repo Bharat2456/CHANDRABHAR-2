@@ -1,15 +1,16 @@
-# Test and validation report (platform 3.0.1-web / engine 8.1.0)
+# Test and validation report (platform 3.0.2-web / engine 8.1.0)
 
 Run on the delivered source tree. Raw evidence: `docs/evidence/e2e-results.json`, `docs/evidence/parity-result.json`, screenshots in `docs/evidence/`.
 
 | Suite | Command | Result |
 |---|---|---|
-| Python: original tests (31) + new engine/security/bridge tests (50), run in the CI-pinned environment (NumPy 2.2.5, SciPy 1.14.1, Shapely 2.0.7, OpenCV 4.11.0) | `python -m pytest -q` | **81 passed** |
+| Python: original tests (31) + new engine/security/bridge/canary tests (51), run in the CI-pinned environment (NumPy 2.2.5, SciPy 1.14.1, Shapely 2.0.7, OpenCV 4.11.0) | `python -m pytest -q` | **82 passed** |
 | JS unit tests (paths, ingestion, preflight, exporters, ZIP, transform metric, CI-pin sync) — 45 | `npm test` | **45 passed** |
 | WASM-vs-native parity — 12 (run with native reference pinned **and** with latest native libraries) | `npm test` | **12 passed** in both |
-| Real-browser E2E (Chromium 153) | `npm run test:e2e` | **65 / 65 passed** |
+| Real-browser E2E (Chromium 153) | `npm run test:e2e` | **67 / 67 passed** (incl. cancellation; 3-cycle cancel/recover stress also passed) |
 | Type-check + production build | `npm run build` | passes; clean-clone `npm ci && npm run build` verified |
 | Original engine self-test | `python -m app.cli.main self-test` | passes (known-transform error ≈ 0.12 px) |
+| **Informational**: native OpenCV 5.0.0 (NumPy 2.5.4, SciPy 1.18.1, Shapely 2.2.0) | `PYTHON=<venv> npm test`; `pytest` | Python **82/82 pass**; Vitest **56/57** — only the strict parity displacement fails (0.903 px), exactly as in CI. Explained in `WEB_PARITY_ANALYSIS.md` (addendum); not blocking by design. |
 
 ## Scientific correctness (all **synthetic**)
 * Geographic-warp registration of two sensors (2 m and 5 m, one rotated 8°, different radiometry) sampled from one analytic surface through PDS4 labels and ISRO-style geometry CSVs: **VALIDATED**, 174 inliers / 201 tentative, RMSE 1.04 px, translation (−0.055, −0.19) px, residual affine ≈ identity. True swath intersection used.
@@ -21,19 +22,19 @@ Run on the delivered source tree. Raw evidence: `docs/evidence/e2e-results.json`
 * Not exercised: rotation/scale sweeps, noise sweeps, partial-overlap sweeps beyond the above, IIRS spectral cubes in the registration path, repetitive-texture outliers. **Listed as gaps, not claims.**
 
 ## Parity (native CPython vs Pyodide, OpenCV 4.11.0)
-Transform criterion: worst-case displacement over the common grid < 0.5 px (derivation and the CI failure analysis: `WEB_PARITY_ANALYSIS.md`). Records: `evidence/parity-result-pinned-deps.json`, `evidence/parity-result-latest-deps.json`.
+Transform criterion: worst-case displacement over the common grid < 0.5 px (derivation: `WEB_PARITY_ANALYSIS.md`). Records: `evidence/parity-result-pinned-deps.json`, `evidence/parity-result-latest-deps.json` (OpenCV 4.13), `evidence/parity-result-opencv5.json`.
 
-| Quantity | Native, pinned to runtime versions | Native, latest (OpenCV 4.13, NumPy 2.4, SciPy 1.17, Shapely 2.2) | WASM |
-|---|---|---|---|
-| Tentative matches | 201 | 201 | 201 |
-| Inliers | 164 | 174 | 164 |
-| Transform displacement vs WASM | 4.0e-5 px | 3.9e-5 px | — |
-| Max coefficient delta (affine) | 3.9e-7 | 3.8e-7 | — |
-| Raw pixel windows (4 formats, 10 windows) | bit-identical | bit-identical | — |
-| Gate outcome, grid, overlap area, metadata | identical | identical | — |
+| Quantity | Native pinned to runtime (OpenCV 4.11) | Native OpenCV 4.13 | Native OpenCV 5.0.0 | WASM (4.11) |
+|---|---|---|---|---|
+| `cv2.remap` interpolation | fixed-point 1/32 px | fixed-point 1/32 px | **exact bilinear** | fixed-point 1/32 px |
+| Keypoints (ref/src) | 691/982 | 691/982 | **696/978** | 691/982 |
+| Tentative matches | 201 | 201 | **206** | 201 |
+| Inliers | 164 | 174 | 172 | 164 |
+| Transform displacement vs WASM | 4.0e-05 px | 3.9e-5 px | **0.903 px (> 0.5: informational failure)** | — |
+| Evidence gate | VALIDATED | VALIDATED | VALIDATED | VALIDATED |
+| Raw pixel windows (4 formats, 10 windows) | bit-identical | bit-identical | bit-identical | — |
 
-The inlier-count difference with latest OpenCV is a behaviour change in `findHomography`'s returned mask (≥ 4.12 recomputes it after refinement), not a different transform.
-**The reported CI failure (affine coefficient delta 0.00213) was not reproducible locally**; see the analysis for what was ruled out and what CI evidence is needed if it recurs.
+Gate outcome, grid, overlap area and product metadata are identical in all environments. The OpenCV 5.0 difference is caused by `cv2.remap` resampling precision (addendum in `WEB_PARITY_ANALYSIS.md`); the strict test is kept, OpenCV ≥ 5 is documented as not yet qualified, and the `latest-deps` CI job reports it without blocking.
 
 ## Security / privacy (E2E, real Chromium)
 Every request same-origin; no non-GET request; no mission names in URLs; zero CSP violations with a policy lacking `unsafe-eval`; no console errors/warnings; traversal, truncated-file, entity-bomb, 3.2 GB file and malformed-size cases handled; opt-in IndexedDB persistence, reload, "clear all" and workspace reset verified.

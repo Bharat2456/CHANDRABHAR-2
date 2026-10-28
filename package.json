@@ -1,6 +1,6 @@
 {
   "name": "chandrabhar-2-web",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "private": true,
   "description": "CHANDRABHAR-2 browser-native lunar image-registration workspace (Python engine running in WebAssembly)",
   "license": "SEE LICENSE IN LICENSE.md",

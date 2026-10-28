@@ -145,7 +145,10 @@ class Store {
     this.set({ run: { ...idleRun, status: 'running', runId, startedAt: Date.now(), stage: 'start' } })
     try {
       const { payload, images } = await this.engine.register(refKey, srcKey, { ...config, max_grid_pixels: this.s.preset.max_grid_pixels, canvas_px: this.s.preset.canvas_px }, runId)
+      // A cancel that lands just as the worker answers must win: never let a stale completion overwrite 'cancelled'.
+      if (!this.isActiveRun(runId)) return
       const hashes = await this.engine.hashes([refKey, srcKey]).catch(() => ({}))
+      if (!this.isActiveRun(runId)) return
       const blobs: Record<string, Blob> = {}; for (const [k, v] of Object.entries(images)) blobs[k] = new Blob([v as BlobPart], { type: 'image/png' })
       const used = new Set([payload.ref.data_file, payload.src.data_file, payload.ref.label, payload.src.label, payload.ref.geometry_csv, payload.src.geometry_csv].filter(Boolean) as string[])
       const result: RunResult = { id: runId, payload, images: blobs, overrides: {}, hashes, config: { ...config }, limits: this.s.preset,
@@ -153,10 +156,12 @@ class Store {
       this.set({ results: [result, ...this.s.results], activeResultId: runId, run: { ...this.s.run, status: 'done' } })
       if (this.s.prefs.persistResults) { const o = await saveRun(result); if (!o.ok) this.toast('warn', o.message); else { result.savedLocally = true; void this.refreshSaved() } }
     } catch (e) {
+      if (!this.isActiveRun(runId)) return      // already settled elsewhere: cancelRun() set 'cancelled', or the crash handler set 'error'
       if (e instanceof CancelledError) { this.set({ run: { ...this.s.run, status: 'cancelled' } }); return }
       const err = e as EngineError; this.set({ run: { ...this.s.run, status: 'error', error: { message: err.message, detail: err.detail } } })
     }
   }
+  private isActiveRun(runId: string) { return this.s.run.runId === runId && this.s.run.status === 'running' }
   async cancelRun() {
     if (this.s.run.status !== 'running') return
     this.set({ engine: { ...this.s.engine, status: 'loading', stage: 'restarting' }, run: { ...this.s.run, status: 'cancelled' } })

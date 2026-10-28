@@ -1,0 +1,158 @@
+{
+ "fixture": "synthetic OHRC/TMC-2 pair (app/synthetic.py), levels=[1.0], common grid 199x191 px",
+ "probes": {
+  "wasm_opencv_4.11": {
+   "versions": {
+    "numpy": "2.2.5",
+    "cv2": "4.11.0",
+    "scipy": "1.14.1",
+    "shapely": "2.0.7",
+    "py": "3.13.2",
+    "platform": "emscripten"
+   },
+   "cv_build_simd": [
+    "CPU/HW features:",
+    "Baseline:"
+   ],
+   "n_points": 201,
+   "inliers": 164,
+   "tentative": 201,
+   "rmse": 0.8929335474967957,
+   "ratio": 0.8159203980099502,
+   "H": [
+    [
+     1.0018906294119998,
+     -0.002719850740974692,
+     -0.05536717278408338
+    ],
+    [
+     0.001676615489205697,
+     0.9994057428723792,
+     -0.18983467838589385
+    ],
+    [
+     1.2619859000851203e-06,
+     -3.719400662220929e-06,
+     1.0
+    ]
+   ],
+   "kp": [
+    691,
+    982
+   ],
+   "pts_sha256": "312b102b979e8469ac48b28fe3b41117450dac3bccadb1eeb937c8abca1dba96",
+   "grid": [
+    191,
+    199
+   ]
+  },
+  "native_opencv_4.13": {
+   "versions": {
+    "numpy": "2.4.4",
+    "cv2": "4.13.0",
+    "scipy": "1.17.1",
+    "shapely": "2.2.0",
+    "py": "3.12.3",
+    "platform": "linux"
+   },
+   "cv_build_simd": [
+    "CPU/HW features:",
+    "Baseline:                    SSE SSE2 SSE3",
+    "Dispatched code generation:  SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX"
+   ],
+   "n_points": 201,
+   "inliers": 174,
+   "tentative": 201,
+   "rmse": 1.0376759767532349,
+   "ratio": 0.8656716417910447,
+   "H": [
+    [
+     1.001890471395661,
+     -0.0027200269360410723,
+     -0.05535994369789701
+    ],
+    [
+     0.0016767004702030088,
+     0.9994053610600201,
+     -0.189830044533048
+    ],
+    [
+     1.2613221082062096e-06,
+     -3.720492334188863e-06,
+     1.0
+    ]
+   ],
+   "kp": [
+    691,
+    982
+   ],
+   "pts_sha256": "ca1de59cb2dd83cb169c58ae4dc13441ed8fe0cea80163f90de9512eea97ab49",
+   "grid": [
+    191,
+    199
+   ]
+  },
+  "native_opencv_5.0": {
+   "versions": {
+    "numpy": "2.5.4",
+    "cv2": "5.0.0",
+    "scipy": "1.18.1",
+    "shapely": "2.2.0",
+    "py": "3.12.3",
+    "platform": "linux"
+   },
+   "cv_build_simd": [
+    "CPU/HW features:",
+    "Baseline:                    SSE SSE2 SSE3",
+    "Dispatched code generation:  SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX"
+   ],
+   "n_points": 206,
+   "inliers": 172,
+   "tentative": 206,
+   "rmse": 1.0006862878799438,
+   "ratio": 0.8349514563106796,
+   "H": [
+    [
+     1.0005460640889319,
+     -0.0005896093966037187,
+     -0.2852318421156497
+    ],
+    [
+     0.0024256772324323887,
+     0.9940083233919712,
+     -0.06260266543088996
+    ],
+    [
+     2.548645315073963e-06,
+     -3.062290700093089e-05,
+     0.9999999999999999
+    ]
+   ],
+   "kp": [
+    696,
+    978
+   ],
+   "pts_sha256": "61a1949f5b01b0566161034542a14d7e68c193f126f18b2b58a9b66a0cc90d95",
+   "grid": [
+    191,
+    199
+   ]
+  }
+ },
+ "displacement_px": {
+  "native5.0_vs_wasm4.11": 0.9033,
+  "native4.13_vs_wasm4.11": 0.0
+ },
+ "distance_from_known_truth_identity_px": {
+  "wasm_4.11": 0.5992,
+  "native_4.13": 0.5993,
+  "native_5.0": 0.833
+ },
+ "ci_log_reported": {
+  "displacement_px": 0.903260767397971,
+  "native_wasm_inliers": "172/164",
+  "tentative": "206/201",
+  "keypoints": "696/978 vs 691/982",
+  "note": "reproduced exactly with NumPy 2.5.4 / OpenCV 5.0.0.93 / SciPy 1.18.1 / Shapely 2.2.0"
+ }
+}

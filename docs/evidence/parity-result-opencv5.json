@@ -1,48 +1,60 @@
 {
-  "measured_utc": "2026-10-22T15:47:08.480Z",
+  "measured_utc": "2026-10-28T02:36:51.701Z",
   "data": "synthetic fixtures (app/synthetic.py), levels=[1.0]",
   "native": {
-    "opencv_note": "native CPython environment",
+    "env": {
+      "python": "3.12.3",
+      "numpy": "2.5.4",
+      "opencv": "5.0.0",
+      "opencv_remap_mode": "exact-float-bilinear",
+      "scipy": "1.18.1",
+      "shapely": "2.2.0",
+      "platform": "Linux-6.18.44-fc-v180-x86_64-with-glibc2.39",
+      "opencv_cpu_features": [
+        "Baseline:                    SSE SSE2 SSE3",
+        "Dispatched code generation:  SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX"
+      ]
+    },
     "metrics": {
       "method": "GEO-WARP-MULTIMODAL+RANSAC",
-      "keypoints_ref": 691,
-      "keypoints_src": 982,
-      "tentative_matches": 201,
-      "inliers": 174,
-      "inlier_ratio": 0.8656716417910447,
+      "keypoints_ref": 696,
+      "keypoints_src": 978,
+      "tentative_matches": 206,
+      "inliers": 172,
+      "inlier_ratio": 0.8349514563106796,
       "coverage": 1,
-      "rmse_px": 1.0376759767532349,
-      "median_error_px": 0.4504249095916748,
-      "p95_error_px": 2.497925043106079,
-      "rmse_m": 5.188379883766174,
+      "rmse_px": 1.0006862878799438,
+      "median_error_px": 0.4970160722732544,
+      "p95_error_px": 2.452404022216797,
+      "rmse_m": 5.003431439399719,
       "target_gsd_m": 5
     },
     "homography": [
       [
-        1.001890471395661,
-        -0.0027200269360410723,
-        -0.05535994369789701
+        1.000546064088932,
+        -0.0005896093966037188,
+        -0.2852318421156498
       ],
       [
-        0.0016767004702030088,
-        0.9994053610600201,
-        -0.189830044533048
+        0.002425677232432389,
+        0.9940083233919713,
+        -0.06260266543088998
       ],
       [
-        0.0000012613221082062096,
-        -0.000003720492334188863,
+        0.0000025486453150739635,
+        -0.000030622907000930896,
         1
       ]
     ],
     "selftest": {
       "passed": true,
-      "inliers": 363,
-      "ratio": 0.3327222731439047,
+      "inliers": 367,
+      "ratio": 0.3398148148148148,
       "coverage": 1,
-      "rmse_px": 0.7362920045852661,
-      "known_transform_error_px": 0.11960234493017197,
+      "rmse_px": 0.7829744815826416,
+      "known_transform_error_px": 0.15818358957767487,
       "gate_status": "INSUFFICIENT_EVIDENCE",
-      "elapsed_s": 4.655303001403809,
+      "elapsed_s": 2.278054714202881,
       "note": "Synthetic engine self-test; not mission validation."
     }
   },
@@ -103,15 +115,26 @@
       "rmse_px": 0.7323243618011475,
       "known_transform_error_px": 0.12528380751609802,
       "gate_status": "INSUFFICIENT_EVIDENCE",
-      "elapsed_s": 8.037999868392944,
+      "elapsed_s": 5.722999811172485,
       "note": "Synthetic engine self-test; not mission validation."
     }
   },
   "pixel_windows_compared": 10,
+  "transform_displacement_px": 0.9032822777574341,
+  "coefficient_deltas": {
+    "H[0][0]": 0.0013445653230677035,
+    "H[0][1]": -0.0021302413443709733,
+    "H[1][0]": -0.0007490617432266921,
+    "H[1][1]": 0.005397419480407839,
+    "H[0][2]": 0.2298646693315664,
+    "H[1][2]": -0.12723201295500386,
+    "H[2][0]": -0.0000012866594149888433,
+    "H[2][1]": 0.000026903506338709967
+  },
   "deltas": {
-    "inliers": -10,
-    "rmse_px": -0.1447424292564392,
-    "tx_px": -0.000007229086186368028,
-    "ty_px": -0.000004633852845853381
+    "inliers": -8,
+    "rmse_px": -0.1077527403831482,
+    "tx_px": 0.2298646693315664,
+    "ty_px": -0.12723201295500386
   }
 }

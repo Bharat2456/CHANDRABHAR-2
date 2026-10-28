@@ -41,8 +41,11 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-  # Informational drift detector: newest releases of the native libraries. A failure here is visible but does not block;
-  # it means a newer NumPy/OpenCV/SciPy/Shapely behaves differently from the pinned, shipped WebAssembly runtime.
+  # Informational drift detector (NEVER blocks): newest releases of the native libraries. Each check is non-blocking at STEP
+  # level, so the job and the commit stay green while a drift is still reported as a warning annotation, a run summary and
+  # downloadable diagnostics. A drift here means a newer NumPy/OpenCV/SciPy/Shapely behaves differently from the pinned,
+  # shipped WebAssembly runtime (known: OpenCV 5.0 resamples with exact bilinear instead of 1/32-px fixed point; see
+  # docs/WEB_PARITY_ANALYSIS.md). The required `test` job above remains strict.
   latest-deps:
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -58,15 +61,43 @@ jobs:
           cache: npm
       - run: pip install numpy opencv-python-headless scipy shapely pytest
       - run: python -m pip list | grep -i -E "numpy|opencv|scipy|shapely"
-      - run: python -m pytest -q
       - run: npm ci
       - run: npm run build
-      - run: npm test
+      - id: py
+        name: Python tests (latest libraries)
+        continue-on-error: true
+        run: python -m pytest -q
+      - id: probe
+        name: Parity probe (full-precision matrices and correspondences)
+        continue-on-error: true
+        run: python tools/parity_probe.py "$RUNNER_TEMP/fx" --build > latest-deps-probe.json
+      - id: parity
+        name: JS tests incl. native-vs-WASM parity (latest libraries)
+        continue-on-error: true
+        run: npm test
+      - name: Summary (informational)
+        if: always()
+        run: |
+          {
+            echo "### latest-deps drift report (informational, does not block)"
+            echo "| check | outcome |"; echo "|---|---|"
+            echo "| Python tests | ${{ steps.py.outcome }} |"
+            echo "| parity probe | ${{ steps.probe.outcome }} |"
+            echo "| JS tests + parity | ${{ steps.parity.outcome }} |"
+            echo
+            echo "Libraries: \`$(python -m pip list 2>/dev/null | grep -i -E 'numpy|opencv|scipy|shapely' | tr '\n' ' ')\`"
+            echo "A failing row means a newer dependency behaves differently from the pinned WebAssembly runtime. See docs/WEB_PARITY_ANALYSIS.md and the diagnostics artifact."
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.py.outcome }}" != "success" ] || [ "${{ steps.parity.outcome }}" != "success" ]; then
+            echo "::warning title=latest-deps drift::Newer native libraries differ from the pinned WebAssembly runtime (informational). See the run summary and the diagnostics-latest-deps artifact."
+          fi
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v6
         with:
           name: diagnostics-latest-deps
-          path: tests-web/parity-result.json
+          path: |
+            tests-web/parity-result.json
+            latest-deps-probe.json
           if-no-files-found: ignore
           retention-days: 14

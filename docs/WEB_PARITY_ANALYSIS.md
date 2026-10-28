@@ -67,3 +67,46 @@ Unchanged: matching cascade, representations, geowarp, evidence-gate thresholds 
 
 ## If it fails again
 Download the `diagnostics` artifact (`parity-result.json`) or read the assertion message. Required to settle the root cause: both matrices, `native_env` (OpenCV/NumPy/SciPy/Shapely versions, CPU feature lines), keypoint and tentative counts, and — if the displacement is large — `python tools/parity_probe.py <fixture>` output from the runner to compare point sets directly.
+
+---
+
+# Addendum (platform 3.0.2): OpenCV 5.0.0 — `latest-deps` parity failure, **reproduced and explained**
+
+CI log (job `latest-deps`): displacement **0.903 px**, inliers 172/164, tentative 206/201, keypoints 696/978 vs 691/982, grid 199×191, native NumPy 2.5.4 / OpenCV 5.0.0 / SciPy 1.18.1 / Shapely 2.2.0 vs WASM NumPy 2.2.5 / OpenCV 4.11.0 / SciPy 1.14.1 / Shapely 2.0.7.
+
+**Reproduced exactly** here (`pip install opencv-python-headless==5.0.0.93` with NumPy 2.5.4, SciPy 1.18.1, Shapely 2.2.0): 696/978 keypoints, 206 matches, 172 inliers, displacement 0.903 px. The result is deterministic, so this is a behaviour change, not noise. Evidence: `docs/evidence/opencv5-parity-analysis.json`.
+
+## Root cause: `cv2.remap` interpolation precision changed in OpenCV 5.0
+
+Bisecting by primitive (same input, three OpenCV versions):
+
+| Primitive | 4.11 | 4.13 | 5.0.0 |
+|---|---|---|---|
+| SIFT keypoints/descriptors (uint8 input) | identical | identical | identical |
+| GaussianBlur, resize (AREA/LINEAR/CUBIC), CLAHE, Sobel | identical | identical | identical (≤ 1e-6 relative) |
+| **`cv2.remap`, `INTER_LINEAR`, float32 maps** | **fixed-point** | **fixed-point** (bit-identical to 4.11) | **exact bilinear** |
+
+Versus an exact float64 bilinear reference (`tools/opencv_resampling_analysis.py`, `docs/evidence/opencv-resampling-*.json`):
+
+| | noise image: max / rms error (gray levels) | smooth image: max / rms |
+|---|---|---|
+| OpenCV 4.11 and 4.13 | 5.37 / 1.06 | 0.187 / 0.057 |
+| OpenCV 5.0.0 | **2×10⁻⁵ / 0** | **2×10⁻⁵ / 0** |
+
+OpenCV ≤ 4.13 quantises sampling coordinates to 1/32 px (fixed-point); 5.0.0 computes the exact value. A fitted offset search found **no coordinate-convention shift** (best offset 0, 0 in all versions). The engine's geographic warp (`app/core/geowarp.py`, `cv2.remap(INTER_LINEAR)`) therefore hands SIFT very slightly different pixels, SIFT finds a few different keypoints (696/978 vs 691/982) and matches (206 vs 201), RANSAC fits a different consensus set, and the transform moves by 0.903 px.
+
+## Is the OpenCV 5.0 result wrong? No — and it is not better either
+
+* 0.903 px is **inside the estimator's own sampling uncertainty** (bootstrap of the correspondences: median 1.11 px, p95 2.53 px).
+* Against the fixture's **known truth** (identity on the common grid): 4.11/4.13 are 0.60 px off, 5.0 is 0.83 px off. Different realisation of the same estimate; neither is "the truth".
+* The evidence gate **passes** under OpenCV 5.0 (172 inliers, ratio 0.835, RMSE 1.00 px).
+
+## Decision
+
+* **The required parity test stays strict (0.5 px, pinned reference).** The shipped WebAssembly runtime is OpenCV 4.11; the engine's results are defined by that build. Raising the tolerance to hide the difference would erase a real, explained behaviour difference.
+* **OpenCV ≥ 5.0 is documented as not yet qualified.** Moving the runtime or the pins to OpenCV 5 requires re-running the parity suite, re-deriving the tolerance and a decision that the new resampling is acceptable scientifically. Pyodide itself currently ships OpenCV 4.11.0.
+* `latest-deps` stays informational: it reports the drift as a warning annotation, a run summary and the `diagnostics-latest-deps` artifact (`parity-result.json` + `latest-deps-probe.json`), without failing the job or the commit.
+* A canary test (`tests/test_opencv_resampling_canary.py`) fails only if OpenCV's sub-pixel convention changes to something other than the two known behaviours (a half-pixel offset would misregister every product). The parity records now include `opencv_remap_mode`.
+* No engine algorithm, threshold or gate logic was changed.
+
+**This also explains the earlier "0.00213" failure (3.0.1).** Under OpenCV 5.0.0 the per-coefficient deltas against the WebAssembly runtime are `H[0][0]` +0.00134, **`H[0][1]` −0.00213024**, `H[1][0]` −0.00075, `H[1][1]` +0.00540, translation (+0.230, −0.127) px (`docs/evidence/parity-result-opencv5.json`). The CI value then reported, 0.002130152…, equals `|H[0][1]|` to four significant digits. At the time no OpenCV 5 environment was available for reproduction, so the cause was attributed to environment-dependent numerics in general; with OpenCV 5.0.0 reproduced, `cv2.remap` precision is the identified cause. (The 3.0.1 coefficient-based assertion was replaced by the displacement metric; the displacement here, 0.903 px, still exceeds the 0.5 px limit, which is why the informational job still reports it.)

@@ -1,8 +1,8 @@
 {
-  "ranAt": "2026-10-24T02:23:14.723Z",
+  "ranAt": "2026-10-28T02:41:38.655Z",
   "browser": "HeadlessChrome/153.0.8010.0",
   "failed": 0,
-  "total": 65,
+  "total": 67,
   "results": [
     {
       "name": "app loads and renders heading",
@@ -132,7 +132,7 @@
     {
       "name": "run completes",
       "ok": true,
-      "detail": "5.3s"
+      "detail": "3.7s"
     },
     {
       "name": "UI stayed responsive during run (page JS thread served polls)",
@@ -267,12 +267,22 @@
     {
       "name": "3.2 GB product previews without crashing the tab",
       "ok": true,
-      "detail": "1.7s total"
+      "detail": "1.9s total"
     },
     {
       "name": "main-thread JS heap stays small",
       "ok": true,
       "detail": "10 MB"
+    },
+    {
+      "name": "progress panel is removed once the run is cancelled",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "cancelled run does not complete in the background (no result appears)",
+      "ok": true,
+      "detail": "cancel took 56 ms"
     },
     {
       "name": "cancel stops the run and reports it",

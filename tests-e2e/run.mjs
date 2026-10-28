@@ -145,7 +145,15 @@ try {
   // ---------- 10. cancel + recovery on the synthetic demo ----------
   await goto('registration'); await clickText('button', 'Use synthetic demo'); await page.waitForSelector('[data-testid=run]', { timeout: 90000 }); await page.waitForFunction(() => /True swath intersection/i.test(document.body.innerText), { timeout: 60000 })
   await page.evaluate(() => { const s = [...document.querySelectorAll('select')].find((x) => /Full cascade/i.test(x.textContent)); const set = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set; set.call(s, 'cascade'); s.dispatchEvent(new Event('change', { bubbles: true })) })
-  await page.click('[data-testid=run]'); await page.waitForSelector('[data-testid=progress]'); await sleep(1500); await clickText('button', 'Cancel run'); await waitText('Run cancelled', 60000)
+  await page.click('[data-testid=run]'); await page.waitForSelector('[data-testid=progress]', { timeout: 15000 })
+  // Wait for the RUNNING state itself (the Cancel control exists only while a run is active) and click in the same tick.
+  // A fixed sleep made this test depend on machine speed: on a fast runner the run finishes first and the button is gone.
+  const cancelT0 = Date.now()
+  try { await page.waitForFunction(() => { const b = [...document.querySelectorAll('button')].find((x) => /Cancel run/i.test(x.textContent) && !x.disabled); if (b) { b.click(); return true } return false }, { polling: 20, timeout: 30000 }) }
+  catch (e) { throw new Error('Cancel control never appeared while the run was active. UI text: ' + (await page.evaluate(() => document.body.innerText.replace(/\s+/g, ' ').slice(0, 400)))) }
+  await waitText('Run cancelled', 60000); const cancelMs = Date.now() - cancelT0
+  const runBtn = await page.evaluate(() => !!document.querySelector('[data-testid=progress]')); check('progress panel is removed once the run is cancelled', !runBtn)
+  await sleep(4000); check('cancelled run does not complete in the background (no result appears)', !/Processing completed/i.test(await page.evaluate(() => document.body.innerText)), `cancel took ${cancelMs} ms`)
   check('cancel stops the run and reports it', true)
   await page.waitForFunction(() => /Engine ready/i.test(document.body.innerText), { timeout: 120000 }); check('engine restarts cleanly after cancel (files preserved)', true)
   await page.waitForFunction(() => !document.querySelector('[data-testid=run]')?.disabled, { timeout: 120000 }); await page.click('[data-testid=run]'); await waitText('Processing completed', 240000); check('a new run succeeds after cancellation', true)
